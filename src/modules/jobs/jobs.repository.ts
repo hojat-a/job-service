@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Job } from './entities/job.entity';
-import { IJob } from './interfaces/jobs.interface';
+import { IJob } from './interfaces/job.interface';
 import { JobFilterDto } from './dto/job-filter.dto';
 
 @Injectable()
@@ -34,9 +34,9 @@ export class JobsRepository {
       }
     }
 
-    // Pagination (same as before)
-    const page = filter.page && filter.page > 0 ? filter.page : 1;
-    const limit = filter.limit && filter.limit > 0 ? filter.limit : 10;
+    // Pagination
+    const page = filter?.page || 1;
+    const limit = filter?.limit || 10;
     const offset = (page - 1) * limit;
 
     query.skip(offset).take(limit);
@@ -77,9 +77,9 @@ export class JobsRepository {
     const { source, externalId } = jobData;
 
     if (!source || !externalId) {
-      throw new Error('sourceApi and externalId are required for upserting a job');
+      throw new Error('sourceApi and externalId are required for upsert a job');
     }
-    // Check if job exists
+    //Check if job exists
     //todo: check if job posted date is changed
     //todo: if there is duplicate jobs, we should use lock to avoid concurrency
     const existingJob = await this.findBySourceAndExternalId(

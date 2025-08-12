@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { IJob } from 'src/modules/jobs/interfaces/jobs.interface';
+import { IJob } from '../../interfaces/job.interface';
+import { JobProvider1Dto } from '../../dto/job-provider-1.dto';
 
 @Injectable()
 export class ApiProvider1Mapper {
   /**
    * Maps the API Provider 1 job data to our unified Job entity
    */
-  mapSource1(data: any): Partial<IJob> {
+  mapSource1(data: JobProvider1Dto): Partial<IJob> {
     // Split "Austin, TX"
     const [city, state] = (data.details?.location || '').split(',').map(v => v.trim());
     // Parse "$50k - $145k"

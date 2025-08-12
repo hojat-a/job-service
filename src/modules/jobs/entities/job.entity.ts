@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { IJob } from '../interfaces/jobs.interface';
+import { IJob } from '../interfaces/job.interface';
 
 @Entity()
 @Index(['externalId', 'source'], { unique: true })

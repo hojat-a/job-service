@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { IJob } from 'src/modules/jobs/interfaces/jobs.interface';
+import { IJob } from '../../interfaces/job.interface';
+import { JobProvider2Dto } from '../../dto/job-provider-2.dto';
 
 @Injectable()
 export class ApiProvider2Mapper {
   /**
    * Maps the API Provider 2 job data to our unified Job entity
    */
-  mapSource2(data: any): Partial<IJob> {
+  mapSource2(data: JobProvider2Dto): Partial<IJob> {
     return {
       externalId: data.externalId,
       title: data.position,

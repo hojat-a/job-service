@@ -1,4 +1,3 @@
-// job-filter.dto.ts
 import { Type } from 'class-transformer';
 import { IsOptional, IsInt, IsString, ValidateNested } from 'class-validator';
 

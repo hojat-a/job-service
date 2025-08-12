@@ -3,6 +3,10 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { ApiProvider1Mapper } from './api-provider-1.mapper';
 import { firstValueFrom } from 'rxjs';
+import { validate } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+import { JobProvider1Dto } from '../../dto/job-provider-1.dto';
+import { IJob } from '../../interfaces/job.interface';
 
 @Injectable()
 export class ApiProvider1Service {
@@ -23,9 +27,24 @@ export class ApiProvider1Service {
         this.httpService.get(`${this.apiUrl}`, {
         }),
       );
-
-      // Map the API response to our unified job model
-      return response.data.jobs.map(job => this.mapper.mapSource1(job));
+      const rawJobs = response?.data?.jobs;
+      const validatedJobs:Partial<IJob>[] = [];
+      
+      for (const rawJob of rawJobs) {
+        const jobDto = plainToInstance(JobProvider1Dto, rawJob);
+  
+        const errors = await validate(jobDto);
+        if (errors.length > 0) {
+          this.logger.warn(`Validation failed for job ${rawJob.jobId}: ${errors}`);
+          continue; // skip invalid job
+        }
+  
+        // If valid, map the job data
+        const unifiedJob = this.mapper.mapSource1(rawJob);
+        validatedJobs.push(unifiedJob);
+      }
+  
+      return validatedJobs;
     } catch (error) {
       this.logger.error(`Error fetching jobs from API Provider 1: ${error.message}`);
       throw error;
