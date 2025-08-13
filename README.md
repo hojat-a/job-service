@@ -16,6 +16,11 @@ A NestJS-based REST API for fetching, filtering, and managing job offers aggrega
     - [Installation](#installation)
     - [Environment Variables](#environment-variables)
   - [Running the Application](#running-the-application)
+    - [Using Docker for PostgreSQL](#using-docker-for-postgresql)
+    - [Starting the Application](#starting-the-application)
+  - [Database Migrations](#database-migrations)
+  - [Adding New Job Providers](#adding-new-job-providers)
+  - [Architecture Decisions](#architecture-decisions)
   - [Testing](#testing)
 
 ---
@@ -106,15 +111,27 @@ Create a `.env` file at the root, copy the `.env.example` contents and set your 
 
 ## Running the Application
 
-1- Start PostgreSql (if you want to access DB by docker)
+### Using Docker for PostgreSQL
+
+1. Start PostgreSQL:
    ```bash
    docker-compose up -d pg
    ```
-   This will start PostgreSql on port `5432`.
 
-2 - Start the project
+2. Run database migrations:
+   ```bash
+   npm run migration:run
+   ```
+
+### Starting the Application
+
 ```bash
+# Development mode with hot reload
 npm run start:dev
+
+# Production mode
+npm run build
+npm run start:prod
 ```
 
 The API will be available at `http://localhost:3000`.
@@ -122,6 +139,36 @@ The API will be available at `http://localhost:3000`.
 Swagger docs available at:  `http://localhost:3000/api`
 
 ---
+## Database Migrations
+
+```bash
+# Generate a new migration
+npm run migration:generate --name=`migration name` -t
+
+# Run pending migrations
+npm run migration:run
+
+# Revert last migration
+npm run migration:revert
+```
+
+## Adding New Job Providers
+
+1. Create a new integration folder in `src/modules/jobs/integrations/`
+2. Implement the service with `fetchJobs()` method
+3. Create a mapper to transform provider data to the unified job interface
+4. Add the provider URL and cron schedule to environment variables
+5. Register the provider in `jobs.service.ts`
+
+## Architecture Decisions
+
+- **Repository Pattern**: Separates data access logic from business logic
+- **DTO Validation**: Ensures data integrity at API boundaries
+- **Global Exception Filter**: Provides consistent error responses
+- **Configuration Service**: Centralizes all configuration access
+- **Retry Utility**: Handles transient failures gracefully
+
+--- 
 
 ## Testing
 

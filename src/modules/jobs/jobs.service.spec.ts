@@ -10,19 +10,8 @@ import fetchWithRetry from 'src/common/utils/retry.util';
 import { JobFilterDto } from './dto/job-filter.dto';
 import { ISuccessResponse } from './interfaces/success-response-interface';
 
-jest.mock('src/common/utils/retry.util'); // mock the retry util
-jest.mock('cron', () => {
-  return {
-    CronJob: jest.fn().mockImplementation((cronTime, onTick) => {
-      return {
-        cronTime,
-        onTick,
-        start: jest.fn(),
-        stop: jest.fn(),
-      };
-    }),
-  };
-});
+jest.mock('src/common/utils/retry.util');
+jest.mock('cron');
 
 describe('JobsService', () => {
   let service: JobsService;

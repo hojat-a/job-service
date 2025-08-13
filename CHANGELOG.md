@@ -14,6 +14,7 @@
  - Add DTO and validation for incoming data from sources
  - Add e2e testa and unit tests for jobs module
  - Add README.md
+ - Add clean up strategy for running crons after module destroy
 ### Fixed
 ### Changed
 ### Removed

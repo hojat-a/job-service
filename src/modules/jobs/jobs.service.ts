@@ -14,14 +14,14 @@ import { ISuccessResponse } from './interfaces/success-response-interface';
 @Injectable()
 export class JobsService {
   private readonly logger = new Logger(JobsService.name);
-
+  private readonly registeredCronJobs: string[] = [];
   constructor(
     private readonly jobsRepository: JobsRepository,
     private readonly configService: ConfigService,
     private readonly apiProvider1Service: ApiProvider1Service,
     private readonly apiProvider2Service: ApiProvider2Service,
     private readonly schedulerRegistry: SchedulerRegistry,
-  ) {}
+  ) { }
 
   onModuleInit() {
     const cron1 = this.configService.get<string>(
@@ -58,6 +58,7 @@ export class JobsService {
     });
 
     this.schedulerRegistry.addCronJob(name, job);
+    this.registeredCronJobs.push(name);
     job.start();
   }
 
@@ -105,5 +106,29 @@ export class JobsService {
 
   async findAll(filterDto: JobFilterDto): Promise<ISuccessResponse> {
     return this.jobsRepository.findAll(filterDto);
+  }
+
+  onModuleDestroy() {
+    // Cron jobs are cleaned up when the module is destroyed to prevent memory leak
+    this.logger.log('Cleaning up cron jobs...');
+
+    // Stop and remove all registered cron jobs
+    for (const jobName of this.registeredCronJobs) {
+      try {
+        const job = this.schedulerRegistry.getCronJob(jobName);
+        if (job) {
+          void job.stop();
+          this.schedulerRegistry.deleteCronJob(jobName);
+          this.logger.log(`Cron job ${jobName} stopped and removed`);
+        }
+      } catch (error) {
+        this.logger.error(`Error removing cron job ${jobName}:`, error);
+      }
+    }
+
+    // Clear the registered jobs array
+    this.registeredCronJobs.length = 0;
+
+    this.logger.log('All cron jobs cleaned up successfully');
   }
 }
