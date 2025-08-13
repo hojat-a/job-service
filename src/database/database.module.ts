@@ -16,7 +16,8 @@ import { SnakeNamingStrategy } from './snake-naming.strategy';
         password: configService.get('POSTGRES_PASSWORD', 'postgres'),
         database: configService.get('POSTGRES_DB', 'jobsdb'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        synchronize: configService.get('NODE_ENV', 'development') === 'development',
+        synchronize:
+          configService.get('NODE_ENV', 'development') === 'development',
         logging: configService.get('NODE_ENV', 'development') === 'development',
         namingStrategy: new SnakeNamingStrategy(),
       }),

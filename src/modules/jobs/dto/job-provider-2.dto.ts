@@ -1,4 +1,13 @@
-import { IsString, IsObject, IsBoolean, IsNumber, IsArray, IsISO8601, ValidateNested, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsObject,
+  IsBoolean,
+  IsNumber,
+  IsArray,
+  IsISO8601,
+  ValidateNested,
+  IsUrl,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class LocationDto {

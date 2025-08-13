@@ -12,28 +12,26 @@ const defaultOptions: RetryOptions = {
   backoffFactor: 2, // Exponential backoff factor
 };
 
-
 export default async function fetchWithRetry<T>(
   fn: () => Promise<T>,
-  options: Partial<RetryOptions> = {}
+  options: Partial<RetryOptions> = {},
 ): Promise<T> {
-
-  const retryOpts = {...defaultOptions, ...options};
+  const retryOpts = { ...defaultOptions, ...options };
   let lastError: any;
-  
+
   for (let attempt = 1; attempt <= retryOpts.maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       lastError = error;
-      console.warn(`Attempt ${attempt} failed: ${error.message}`);
+      console.warn(`Attempt ${attempt} failed: ${error?.message}`);
       if (error?.status < 500) {
         throw error;
       }
       // Calculate delay with exponential backoff
       const delay = Math.min(
         retryOpts.initialDelay * Math.pow(retryOpts.backoffFactor, attempt - 1),
-        retryOpts.maxDelay
+        retryOpts.maxDelay,
       );
       if (attempt < retryOpts.maxRetries) {
         await new Promise((resolve) => setTimeout(resolve, delay));

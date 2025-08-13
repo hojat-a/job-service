@@ -24,10 +24,10 @@ export class ApiProvider2Service {
   async fetchJobs(): Promise<Partial<IJob>[]> {
     try {
       const response = await firstValueFrom(
-        this.httpService.get(`${this.apiUrl}`, {}),
+        this.httpService.get(`${this.apiUrl}`),
       );
       const jobsObject: object = response.data?.data?.jobsList;
-      const jobsArray: JobProvider2Dto[] = []
+      const jobsArray: JobProvider2Dto[] = [];
       for (const [externalId, jobData] of Object.entries(jobsObject)) {
         jobsArray.push({
           externalId,
@@ -41,7 +41,9 @@ export class ApiProvider2Service {
 
         const errors = await validate(jobDto);
         if (errors.length > 0) {
-          this.logger.warn(`Validation failed for job ${rawJob.externalId}: ${errors}`);
+          this.logger.warn(
+            `Validation failed for job ${rawJob.externalId}: ${errors}`,
+          );
           continue; // skip invalid job
         }
 
@@ -52,7 +54,9 @@ export class ApiProvider2Service {
 
       return validatedJobs;
     } catch (error) {
-      this.logger.error(`Error fetching jobs from API Provider 2: ${error.message}`);
+      this.logger.error(
+        `Error fetching jobs from API Provider 2: ${error?.message}`,
+      );
       throw error;
     }
   }

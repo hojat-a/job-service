@@ -9,14 +9,16 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Apply validation globally
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-    transformOptions: {
-      enableImplicitConversion: true,
-    }
-  }));
-  
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
+
   //Allow query objects
   app.set('query parser', 'extended');
 
@@ -30,8 +32,10 @@ async function bootstrap() {
 
   // Set up Swagger
   const config = new DocumentBuilder()
-    .setTitle('Job Aggregator API')
-    .setDescription('API for aggregating and searching job offers from multiple sources')
+    .setTitle('Job Service')
+    .setDescription(
+      'API for aggregating and searching job offers from multiple sources',
+    )
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

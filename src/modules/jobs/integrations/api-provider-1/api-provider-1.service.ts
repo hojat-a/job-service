@@ -21,32 +21,35 @@ export class ApiProvider1Service {
     this.apiUrl = this.configService.get<string>('API_PROVIDER_1_URL');
   }
 
-  async fetchJobs() {
+  async fetchJobs(): Promise<Partial<IJob>[]> {
     try {
       const response = await firstValueFrom(
-        this.httpService.get(`${this.apiUrl}`, {
-        }),
+        this.httpService.get(`${this.apiUrl}`, {}),
       );
       const rawJobs = response?.data?.jobs;
-      const validatedJobs:Partial<IJob>[] = [];
-      
+      const validatedJobs: Partial<IJob>[] = [];
+
       for (const rawJob of rawJobs) {
         const jobDto = plainToInstance(JobProvider1Dto, rawJob);
-  
+
         const errors = await validate(jobDto);
         if (errors.length > 0) {
-          this.logger.warn(`Validation failed for job ${rawJob.jobId}: ${errors}`);
+          this.logger.warn(
+            `Validation failed for job ${rawJob.jobId}: ${errors}`,
+          );
           continue; // skip invalid job
         }
-  
+
         // If valid, map the job data
         const unifiedJob = this.mapper.mapSource1(rawJob);
         validatedJobs.push(unifiedJob);
       }
-  
+
       return validatedJobs;
     } catch (error) {
-      this.logger.error(`Error fetching jobs from API Provider 1: ${error.message}`);
+      this.logger.error(
+        `Error fetching jobs from API Provider 1: ${error.message}`,
+      );
       throw error;
     }
   }

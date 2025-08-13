@@ -21,10 +21,10 @@ export class ApiProvider2Mapper {
       experience: data.requirements?.experience,
       skills: data.requirements?.technologies || [],
       postedDate: new Date(data.datePosted),
-      source: 'source2',
+      source: 'source2', //TODO: Add to constants
       metadata: {
         companyWebsite: data.employer?.website,
-      }
+      },
     };
   }
 }

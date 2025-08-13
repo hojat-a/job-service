@@ -12,6 +12,8 @@
  - Implement global exception handler
  - Make scheduling configurable
  - Add DTO and validation for incoming data from sources
+ - Add e2e testa and unit tests for jobs module
+ - Add README.md
 ### Fixed
 ### Changed
 ### Removed

@@ -9,9 +9,13 @@ export class ApiProvider1Mapper {
    */
   mapSource1(data: JobProvider1Dto): Partial<IJob> {
     // Split "Austin, TX"
-    const [city, state] = (data.details?.location || '').split(',').map(v => v.trim());
+    const [city, state] = (data.details?.location || '')
+      .split(',')
+      .map((v) => v.trim());
     // Parse "$50k - $145k"
-    const salaryMatch = /\$?([\d.,]+)k\s*-\s*\$?([\d.,]+)k/i.exec(data.details?.salaryRange || '');
+    const salaryMatch = /\$?([\d.,]+)k\s*-\s*\$?([\d.,]+)k/i.exec(
+      data.details?.salaryRange || '',
+    );
     const minSalary = salaryMatch ? parseInt(salaryMatch[1]) * 1000 : null;
     const maxSalary = salaryMatch ? parseInt(salaryMatch[2]) * 1000 : null;
 
@@ -23,12 +27,12 @@ export class ApiProvider1Mapper {
       jobType: data.details?.type,
       minSalary,
       maxSalary,
-      currency: 'USD', // default
+      currency: 'USD', // default,TODO: Add to constants
       companyName: data.company?.name,
       companyIndustry: data.company?.industry,
       skills: data.skills || [],
       postedDate: new Date(data.postedDate),
-      source: 'source1'
+      source: 'source1', //TODO: Add to constants
     };
   }
 }

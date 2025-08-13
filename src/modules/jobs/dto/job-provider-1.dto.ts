@@ -1,4 +1,10 @@
-import { IsString, IsObject, IsArray, IsISO8601, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsObject,
+  IsArray,
+  IsISO8601,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class DetailsDto {

@@ -11,10 +11,7 @@ import { ApiProvider2Mapper } from './integrations/api-provider-2/api-provider-2
 import { ApiProvider1Mapper } from './integrations/api-provider-1/api-provider-1.mapper';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Job]),
-    HttpModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Job]), HttpModule],
   controllers: [JobsController],
   providers: [
     JobsService,
@@ -26,4 +23,4 @@ import { ApiProvider1Mapper } from './integrations/api-provider-1/api-provider-1
   ],
   exports: [],
 })
-export class JobsModule { }
+export class JobsModule {}

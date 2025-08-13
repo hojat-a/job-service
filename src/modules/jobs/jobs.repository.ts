@@ -10,9 +10,11 @@ export class JobsRepository {
   constructor(
     @InjectRepository(Job)
     private repository: Repository<IJob>,
-  ) { }
+  ) {}
 
-  async findAll(filter: JobFilterDto): Promise<{ data: IJob[], total: number }> {
+  async findAll(
+    filter: JobFilterDto,
+  ): Promise<{ data: IJob[]; total: number }> {
     const query = this.repository.createQueryBuilder('job');
 
     if (filter.title) {
@@ -27,10 +29,14 @@ export class JobsRepository {
 
     if (filter.salary) {
       if (filter.salary.min !== undefined) {
-        query.andWhere('job.minSalary >= :minSalary', { minSalary: filter.salary.min });
+        query.andWhere('job.minSalary >= :minSalary', {
+          minSalary: filter.salary.min,
+        });
       }
       if (filter.salary.max !== undefined) {
-        query.andWhere('job.maxSalary <= :maxSalary', { maxSalary: filter.salary.max });
+        query.andWhere('job.maxSalary <= :maxSalary', {
+          maxSalary: filter.salary.max,
+        });
       }
     }
 
@@ -45,11 +51,14 @@ export class JobsRepository {
 
     return {
       data,
-      total
+      total,
     };
   }
 
-  async findBySourceAndExternalId(source: string, externalId: string): Promise<IJob | null> {
+  async findBySourceAndExternalId(
+    source: string,
+    externalId: string,
+  ): Promise<IJob | null> {
     return this.repository.findOne({
       where: {
         source,
@@ -84,7 +93,7 @@ export class JobsRepository {
     //todo: if there is duplicate jobs, we should use lock to avoid concurrency
     const existingJob = await this.findBySourceAndExternalId(
       source,
-      externalId
+      externalId,
     );
 
     if (existingJob) {

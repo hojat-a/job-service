@@ -1,9 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, Index, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { IJob } from '../interfaces/job.interface';
 
 @Entity()
 @Index(['externalId', 'source'], { unique: true })
-export class Job implements IJob{
+export class Job implements IJob {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

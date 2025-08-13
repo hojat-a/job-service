@@ -21,22 +21,32 @@ export class JobsService {
     private readonly apiProvider1Service: ApiProvider1Service,
     private readonly apiProvider2Service: ApiProvider2Service,
     private readonly schedulerRegistry: SchedulerRegistry,
-  ) { }
+  ) {}
 
   onModuleInit() {
-    const cron1 = this.configService.get<string>('API_PROVIDER_1_CRON', CronExpression.EVERY_10_MINUTES);
-    const cron2 = this.configService.get<string>('API_PROVIDER_2_CRON', CronExpression.EVERY_10_MINUTES);
+    const cron1 = this.configService.get<string>(
+      'API_PROVIDER_1_CRON',
+      CronExpression.EVERY_10_MINUTES,
+    );
+    const cron2 = this.configService.get<string>(
+      'API_PROVIDER_2_CRON',
+      CronExpression.EVERY_10_MINUTES,
+    );
 
     this.registerCron('provider1Job', cron1, () =>
-      this.syncJobs('source1', () => this.apiProvider1Service.fetchJobs())
+      this.syncJobs('source1', () => this.apiProvider1Service.fetchJobs()),
     );
 
     this.registerCron('provider2Job', cron2, () =>
-      this.syncJobs('source2', () => this.apiProvider2Service.fetchJobs())
+      this.syncJobs('source2', () => this.apiProvider2Service.fetchJobs()),
     );
   }
 
-  private registerCron(name: string, cronTime: string, task: () => Promise<number>) {
+  private registerCron(
+    name: string,
+    cronTime: string,
+    task: () => Promise<void>,
+  ) {
     this.logger.log(`Registering cron job: ${name} with schedule: ${cronTime}`);
 
     const job = new CronJob(cronTime, async () => {
@@ -51,39 +61,45 @@ export class JobsService {
     job.start();
   }
 
-  private async syncJobs(source: string, provider: () => Promise<Partial<IJob>[]>): Promise<number> {
+  private async syncJobs(
+    source: string,
+    provider: () => Promise<Partial<IJob>[]>,
+  ): Promise<void> {
     try {
       this.logger.log(`Fetching jobs from ${source}`);
-      const jobs = await fetchWithRetry(
-        () => provider(),
-        {
-          maxRetries: 3,
-          initialDelay: 1000
-        }
-      );
+      const jobs = await fetchWithRetry(() => provider(), {
+        maxRetries: 3, //TODO: Add to constants
+        initialDelay: 1000, //TODO: Add to constants
+      });
       this.logger.log(`Fetched ${jobs.length} jobs from ${source}`);
 
       // Process jobs in batches to avoid overloading the database
-      const batchSize = 50;
+      const batchSize = 50; //TODO: Add to constants
       for (let i = 0; i < jobs.length; i += batchSize) {
         const batch = jobs.slice(i, i + batchSize);
 
         const results = await Promise.allSettled(
-          batch.map(job => this.jobsRepository.upsertJob(job))
+          batch.map((job) => this.jobsRepository.upsertJob(job)),
         );
         results.forEach((result, index) => {
           if (result.status === 'rejected') {
-            this.logger.error(`Failed to upsert job ${batch[index].externalId}: ${result.reason}`);
+            this.logger.error(
+              `Failed to upsert job ${batch[index].externalId}: ${result.reason}`,
+            );
           }
         });
 
-        this.logger.log(`Processed batch ${(i / batchSize) + 1}/${Math.ceil(jobs.length / batchSize)} from ${source}`);
+        this.logger.log(
+          `Processed batch ${i / batchSize + 1}/${Math.ceil(jobs.length / batchSize)} from ${source}`,
+        );
       }
 
-      return jobs.length;
+      return;
     } catch (error) {
-      this.logger.error(`Error synchronizing jobs from ${source}: ${error.message}`);
-      return 0;
+      this.logger.error(
+        `Error synchronizing jobs from ${source}: ${error?.message}`,
+      );
+      return;
     }
   }
 
